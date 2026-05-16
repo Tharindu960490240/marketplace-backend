@@ -1,5 +1,4 @@
 const sgMail = require("@sendgrid/mail");
-
 const constants = require("../config/const");
 
 sgMail.setApiKey(constants.SENDGRID_API_KEY);
@@ -7,8 +6,11 @@ sgMail.setApiKey(constants.SENDGRID_API_KEY);
 const sendEmail = async ({ email, subject, text, html }) => {
   try {
     const msg = {
-      from: `"Agri Link Services Marketplace" <${constants.EMAIL_USER}>`,
       to: email,
+      from: {
+        email: constants.EMAIL_USER,
+        name: "Agri Link Services Marketplace",
+      },
       subject,
       text,
       html,
@@ -22,7 +24,10 @@ const sendEmail = async ({ email, subject, text, html }) => {
       response,
     };
   } catch (error) {
-    console.error("SENDGRID ERROR:", error.response?.body || error.message);
+    console.error(
+      "SENDGRID ERROR:",
+      error.response?.body || error.message
+    );
     throw new Error("Email failed");
   }
 };
