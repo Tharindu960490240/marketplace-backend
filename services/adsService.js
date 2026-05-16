@@ -1,6 +1,6 @@
 const pool = require("../config/database");
 const fs = require("fs");
-const { getUserById } = require("./userService");
+const { getUserById } = require("./authService");
 const constants = require("../config/const");
 
 // ================= CREATE AD =================

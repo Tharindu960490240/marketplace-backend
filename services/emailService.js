@@ -4,8 +4,8 @@ const constants = require("../config/const");
 // Create transporter
 const transporter = nodemailer.createTransport({
   host: "smtp.zoho.com",
-  port: 465,
-  secure: true,
+  port: 587,
+  secure: false,
   auth: {
     user: constants.EMAIL_USER,
     pass: constants.EMAIL_PASS,

@@ -36,7 +36,7 @@ const createSubscriptionsTable = async () => {
       WHERE status = 'active';
     `);
 
-    console.log("Subscriptions table & indexes created");
+    // console.log("Subscriptions table & indexes created");
   } catch (err) {
     console.error("Error creating subscriptions table:", err);
   }
