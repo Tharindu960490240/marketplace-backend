@@ -3,17 +3,16 @@ const constants = require("../config/const");
 
 const transporter = nodemailer.createTransport({
   host: "smtp.zoho.com",
-  port: 465,
-  secure: true,
+  port: 587,
+  secure: false, // IMPORTANT: false for 587
   auth: {
     user: constants.EMAIL_USER,
-    pass: constants.EMAIL_PASS,
+    pass: constants.EMAIL_PASS, // use App Password
   },
   tls: {
-    rejectUnauthorized: false,
     minVersion: "TLSv1.2",
   },
-  connectionTimeout: 10000,
+  connectionTimeout: 20000,
 });
 
 // Verify connection on startup
