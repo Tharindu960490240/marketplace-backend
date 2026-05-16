@@ -7,7 +7,7 @@ sgMail.setApiKey(constants.SENDGRID_API_KEY);
 const sendEmail = async ({ email, subject, text, html }) => {
   try {
     const msg = {
-      from: `Agri Link Services Marketplace <${constants.EMAIL_USER}>`,
+      from: constants.EMAIL_USER,
       to: email,
       subject,
       text,
