@@ -2,18 +2,17 @@ const nodemailer = require("nodemailer");
 const constants = require("../config/const");
 
 const transporter = nodemailer.createTransport({
-  host: "smtp.zoho.com",
+  host: "smtpx.zoho.com", // Switched to the transactional SMTP endpoint
   port: 465,
-  secure: true,
+  secure: true, 
   auth: {
     user: constants.EMAIL_USER,
-    pass: constants.EMAIL_PASS,
+    pass: constants.EMAIL_PASS, // Keep using the App-Specific Password
   },
   tls: {
     rejectUnauthorized: false,
-    minVersion: "TLSv1.2",
   },
-  connectionTimeout: 10000,
+  connectionTimeout: 10000, // 10 seconds
 });
 
 // Verify connection on startup
