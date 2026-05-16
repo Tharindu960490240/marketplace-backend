@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 
-const constants = require("./config/const.js");
+require("dotenv").config();
 
 const cron = require("node-cron");
 const downgradeExpiredUsers = require("./jobs/subscriptionJob.js");
@@ -38,7 +38,7 @@ const { createNotificationTable } = require("./models/notification.js");
 
 
 const app = express();
-const PORT = constants.PORT || 3200;
+const PORT = process.env.PORT || 3200;
 
 // ================= MIDDLEWARE =================
 app.use(express.json());

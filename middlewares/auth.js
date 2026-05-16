@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const constants = require("../config/const");
+require("dotenv").config();
 
 const authMiddleware = (req, res, next) => {
   try {
@@ -18,7 +18,7 @@ const authMiddleware = (req, res, next) => {
     }
 
     // 3. Verify token
-    const decoded = jwt.verify(token, constants.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     // 4. Attach user to request
     req.user = decoded;
@@ -41,7 +41,7 @@ const optionalAuth = (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, constants.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded;
   } catch (err) {
     req.user = null;

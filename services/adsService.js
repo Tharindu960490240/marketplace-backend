@@ -1,7 +1,7 @@
 const pool = require("../config/database");
 const fs = require("fs");
 const { getUserById } = require("./authService");
-const constants = require("../config/const");
+require("dotenv").config();
 
 // ================= CREATE AD =================
 const createAdService = async (data, userId) => {
@@ -607,7 +607,7 @@ const canPostAd = async (userId) => {
   );
   const count = parseInt(result.rows[0].count);
 
-  return count < constants.MAX_ADS_COUNT;
+  return count < process.env.MAX_ADS_COUNT;
 };
 
 const isPremium = (user) => {

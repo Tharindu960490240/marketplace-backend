@@ -1,14 +1,13 @@
 const { Pool } = require("pg");
-
-const constants = require("../config/const");
+require("dotenv").config();
 
 // Default pool connects to the default database (like postgres)
 const defaultPool = new Pool({
-  user: constants.DB_USER,
-  host: constants.DB_HOST,
-  database: constants.DEFAULT_DB,
-  password: constants.DB_PASSWORD,
-  port: constants.DB_PORT,
+  user: process.env.DB_USER,
+  host: process.env.DB_HOST,
+  database: process.env.DEFAULT_DB,
+  password: process.env.DB_PASSWORD,
+  port: process.env.DB_PORT,
   ssl: { rejectUnauthorized: false },
 });
 
@@ -17,15 +16,15 @@ const createDatabase = async () => {
   try {
     // Check if the target database exists
     const res = await defaultPool.query(
-      `SELECT 1 FROM pg_database WHERE datname = '${constants.DB_NAME}'`,
+      `SELECT 1 FROM pg_database WHERE datname = '${process.env.DB_NAME}'`,
     );
 
     if (res.rowCount === 0) {
       // Database does not exist, create it
-      await defaultPool.query(`CREATE DATABASE ${constants.DB_NAME}`);
-      console.log(`Database ${constants.DB_NAME} created successfully!`);
+      await defaultPool.query(`CREATE DATABASE ${process.env.DB_NAME}`);
+      console.log(`Database ${process.env.DB_NAME} created successfully!`);
     } else {
-      // console.log(`Database ${constants.DB_NAME} already exists.`);
+      // console.log(`Database ${process.env.DB_NAME} already exists.`);
     }
   } catch (err) {
     console.error("Error checking/creating database:", err);
@@ -37,11 +36,11 @@ const createDatabase = async () => {
 
 // Create a new pool for connecting to the desired database
 const pool = new Pool({
-  user: constants.DB_USER,
-  host: constants.DB_HOST,
-  database: constants.DB_NAME,
-  password: constants.DB_PASSWORD,
-  port: constants.DB_PORT,
+  user: process.env.DB_USER,
+  host: process.env.DB_HOST,
+  database: process.env.DB_NAME,
+  password: process.env.DB_PASSWORD,
+  port: process.env.DB_PORT,
   ssl: { rejectUnauthorized: false },
 });
 

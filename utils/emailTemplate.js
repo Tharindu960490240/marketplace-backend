@@ -1,14 +1,14 @@
-const constants = require("../config/const");
+require("dotenv").config();
 
 const buildEmailTemplate = ({ title, content, action }) => {
   return `
-    <div style="margin:0;padding:0;background:#f4f6f8;font-family:Arial,Helvetica,sans-serif;">
+    <div style="margin:20px;padding:0;background:#f4f6f8;font-family:Arial,Helvetica,sans-serif;">
 
       <div style="max-width:600px;margin:0 auto;background:#ffffff;border-radius:10px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,0.05);">
 
         <!-- Header -->
         <div style="background:linear-gradient(135deg,#2196f3 0%,#4dabf5 100%);padding:25px;text-align:center;">
-          <img src="${constants.LOGO_URL || "https://via.placeholder.com/120x40?text=Logo"}"
+          <img src="${process.env.LOGO_URL || "https://via.placeholder.com/120x40?text=Logo"}"
                alt="Logo"
                style="width:120px;margin-bottom:10px;" />
           <h2 style="color:#ffffff;margin:0;font-size:22px;">

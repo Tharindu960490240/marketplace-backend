@@ -24,14 +24,14 @@ const { buildEmailTemplate } = require("../utils/emailTemplate");
 
 const { sendEmail } = require("../services/emailService");
 
-const constants = require("../config/const");
+require("dotenv").config();
 
 // ================= REGISTER =================
 const register = async (req, res) => {
   try {
     const { user, verificationToken } = await registerUser(req.body);
 
-    const verifyUrl = `${constants.FRONTEND_URL}/verify/${verificationToken}`;
+    const verifyUrl = `${process.env.FRONTEND_URL}/verify/${verificationToken}`;
 
     const html = buildEmailTemplate({
       title: "Verify your account",
@@ -134,7 +134,7 @@ const resendVerificationController = async (req, res) => {
   try {
     const { user, token } = await resendVerification(req.body.email);
 
-    const verifyUrl = `${constants.FRONTEND_URL}/verify/${token}`;
+    const verifyUrl = `${process.env.FRONTEND_URL}/verify/${token}`;
 
     const html = buildEmailTemplate({
       title: "Verify your account",
@@ -273,7 +273,7 @@ const sendPasswordResetLink = async (req, res) => {
 
     const token = generateResetToken(user);
 
-    const resetUrl = `${constants.FRONTEND_URL}/reset-password?token=${token}`;
+    const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
 
     const html = buildEmailTemplate({
       title: "Password Reset Request",
