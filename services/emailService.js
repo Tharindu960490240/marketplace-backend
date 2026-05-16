@@ -1,30 +1,52 @@
-const sgMail = require("@sendgrid/mail");
-
+const nodemailer = require("nodemailer");
 const constants = require("../config/const");
 
-sgMail.setApiKey(constants.SENDGRID_API_KEY);
+const transporter = nodemailer.createTransport({
+  host: "smtp.zoho.com",
+  port: 587,
+  secure: false, // must be false for 587
+  auth: {
+    user: constants.EMAIL_USER,
+    pass: constants.EMAIL_PASS,
+  },
+  requireTLS: true,
+});
 
+// Verify connection on startup
+transporter.verify((error, success) => {
+  if (error) {
+    console.error("FULL ERROR:", error);
+  } else {
+    console.log("Email service is ready");
+  }
+});
+
+// Send email
 const sendEmail = async ({ email, subject, text, html }) => {
   try {
-    const msg = {
-      from: constants.EMAIL_USER,
+    const mailOptions = {
+      from: `"Agri Link Services Marketplace" <${constants.EMAIL_USER}>`,
       to: email,
       subject,
       text,
       html,
     };
 
-    const response = await sgMail.send(msg);
+    const info = await transporter.sendMail(mailOptions);
 
     return {
       success: true,
       message: "Email sent successfully",
-      response,
+      messageId: info.messageId,
     };
   } catch (error) {
-    console.error("SENDGRID ERROR:", error.response?.body || error.message);
-    throw new Error("Email failed");
+    console.error("Email send failed:", error);
+    throw new Error(error.message);
   }
 };
 
-module.exports = { sendEmail };
+module.exports = {
+  sendEmail,
+};
+
+

@@ -22,7 +22,7 @@ let constants = {
   HOST: "dpg-d83sdhfaqgkc73a3qr20-a",
 
   EMAIL_USER: "info@agrilinkservices.com",
-  EMAIL_PASS: "AgriLinkServices@2025",
+  EMAIL_PASS: "3jm2a91By6cg",
 
   FRONTEND_URL_2: "http://localhost:4200",
 
