@@ -1,0 +1,32 @@
+let constants = {
+  SECRET_KEY: "deliver_app",
+  UPLOAD_PROFILE_PIC_FULL: "upload/profile_pic/full/",
+  UPLOAD_PROFILE_PIC_THUMB: "upload/profile_pic/thumb/",
+
+  MERCHANT_COMMISSION_PERCENT: 10,
+  DRIVER_COMMISSION_PERCENT: 15,
+
+  PORT: 3200,
+  DB_USER: "postgres",
+  DB_PASSWORD: "9761",
+  DB_HOST: "localhost",
+  DB_PORT: 5432,
+  DB_NAME: "sathwa_sewana",
+  DEFAULT_DB: "postgres",
+  HOST: "192.168.5.18",
+
+  EMAIL_USER: "info@agrilinkservices.com",
+  EMAIL_PASS: "AgriLinkServices@2025",
+
+  FRONTEND_URL_2: "http://localhost:4200",
+
+  JWT_SECRET: "dilan_sathwa_sewana_secret_key_2026",
+  JWT_EXPIRES_IN: "1h",
+  LOGO_URL: "http://localhost:3200/images/logo.png",
+
+  FRONTEND_URL: "https://bd8c-112-213-178-240.ngrok-free.app",
+
+  MAX_ADS_COUNT: 5,
+};
+
+module.exports = Object.freeze(constants);
