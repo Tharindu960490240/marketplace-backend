@@ -385,7 +385,6 @@ module.exports = {
   deleteUserAccount,
 };
 
-
 // await pool.query(`
 //   UPDATE users
 //   SET subscription_type = 'premium',

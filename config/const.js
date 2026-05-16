@@ -1,5 +1,4 @@
 let constants = {
-
   UPLOAD_PROFILE_PIC_FULL: "upload/profile_pic/full/",
   UPLOAD_PROFILE_PIC_THUMB: "upload/profile_pic/thumb/",
 
@@ -22,8 +21,10 @@ let constants = {
 
   HOST: "dpg-d83sdhfaqgkc73a3qr20-a",
 
-  EMAIL_USER: "info@agrilinkservices.com",
-  EMAIL_PASS: "HpPPMcRvmfeP",
+  EMAIL: "info@agrilinkservices.com",
+  EMAIL_USER: "ab7754001@smtp-brevo.com",
+  EMAIL_PASS:
+    "xsmtpsib-1255bf45b91a4af2adaf7408cd8aff0819a941ced0cb5cffac3ae043e0660a49-qYAagBe8uKDOXgDg",
 
   FRONTEND_URL_2: "http://localhost:4200",
 
@@ -38,4 +39,3 @@ let constants = {
 };
 
 module.exports = Object.freeze(constants);
-
