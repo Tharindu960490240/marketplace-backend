@@ -1,6 +1,9 @@
 const nodemailer = require("nodemailer");
 const constants = require("../config/const");
 
+console.log("Email User:", constants.EMAIL_USER);
+console.log("Email Pass Exists:", !!constants.EMAIL_PASS); // Will print true or false
+
 const transporter = nodemailer.createTransport({
   host: "smtp.zoho.com",
   port: 465,
@@ -9,7 +12,6 @@ const transporter = nodemailer.createTransport({
     user: constants.EMAIL_USER,
     pass: constants.EMAIL_PASS,
   },
-  // You can keep or remove this; with secure: true, it's safer to let it validate
   tls: {
     ciphers: "SSLv3",
     rejectUnauthorized: false,
@@ -21,7 +23,7 @@ transporter.verify((error, success) => {
   if (error) {
     console.error("Email service error:", error.message);
   } else {
-    // console.log("Email service is ready");
+    console.log("Email service is ready");
   }
 });
 
