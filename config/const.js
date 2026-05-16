@@ -29,9 +29,10 @@ let constants = {
 
   JWT_SECRET: "dilan_sathwa_sewana_secret_key_2026",
   JWT_EXPIRES_IN: "1h",
-  LOGO_URL: "http://localhost:3200/images/logo.png",
+  LOGO_URL:
+    "https://marketplace-frontend-tawny.vercel.app/public/assets/logo.png",
 
-  FRONTEND_URL: "https://bd8c-112-213-178-240.ngrok-free.app",
+  FRONTEND_URL: "https://marketplace-frontend-tawny.vercel.app/",
 
   MAX_ADS_COUNT: 5,
 };
