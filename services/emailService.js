@@ -9,10 +9,14 @@ const transporter = nodemailer.createTransport({
     user: constants.EMAIL_USER,
     pass: '3jm2a91By6cg', // use App Password
   },
+  requireTLS: true,
   tls: {
     minVersion: "TLSv1.2",
+    rejectUnauthorized: false, // important for cloud
   },
-  connectionTimeout: 20000,
+  connectionTimeout: 30000,
+  greetingTimeout: 15000,
+  socketTimeout: 30000,
 });
 
 // Verify connection on startup
@@ -51,3 +55,5 @@ const sendEmail = async ({ email, subject, text, html }) => {
 module.exports = {
   sendEmail,
 };
+
+

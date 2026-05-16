@@ -34,6 +34,9 @@ let constants = {
   FRONTEND_URL: "https://marketplace-frontend-tawny.vercel.app/",
 
   MAX_ADS_COUNT: 5,
+
+  GMAIL_USER: "infor.quickdrop@gmail.com",
+  GMAIL_PASS: "rbjzfwvviiyxqxer",
 };
 
 module.exports = Object.freeze(constants);
