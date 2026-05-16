@@ -14,7 +14,7 @@ let constants = {
   // HOST: "192.168.5.18,
   DEFAULT_DB: "postgres",
 
-  DB_HOST: "postgresql://marketplace_user:eXhP7g0Nq16FstcAm2XSIZEk6MwxM4Sw@dpg-d83sdhfaqgkc73a3qr20-a/sathwa_sewana",
+  DB_HOST: "dpg-d83sdhfaqgkc73a3qr20-a.virginia-postgres.render.com",
   DB_PORT: 5432,
   DB_NAME: "sathwa_sewana",
   DB_USER: "marketplace_user",

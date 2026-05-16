@@ -1,4 +1,4 @@
-const { Pool } = require('pg');
+const { Pool } = require("pg");
 
 const constants = require("../config/const");
 
@@ -6,9 +6,10 @@ const constants = require("../config/const");
 const defaultPool = new Pool({
   user: constants.DB_USER,
   host: constants.DB_HOST,
-  database: constants.DEFAULT_DB, 
+  database: constants.DEFAULT_DB,
   password: constants.DB_PASSWORD,
   port: constants.DB_PORT,
+  ssl: { rejectUnauthorized: false },
 });
 
 // Function to create a new database if it doesn't exist
@@ -16,7 +17,7 @@ const createDatabase = async () => {
   try {
     // Check if the target database exists
     const res = await defaultPool.query(
-      `SELECT 1 FROM pg_database WHERE datname = '${constants.DB_NAME}'`
+      `SELECT 1 FROM pg_database WHERE datname = '${constants.DB_NAME}'`,
     );
 
     if (res.rowCount === 0) {
@@ -27,8 +28,8 @@ const createDatabase = async () => {
       // console.log(`Database ${constants.DB_NAME} already exists.`);
     }
   } catch (err) {
-    console.error('Error checking/creating database:', err);
-    throw err; 
+    console.error("Error checking/creating database:", err);
+    throw err;
   } finally {
     await defaultPool.end();
   }
@@ -38,14 +39,15 @@ const createDatabase = async () => {
 const pool = new Pool({
   user: constants.DB_USER,
   host: constants.DB_HOST,
-  database: constants.DB_NAME, 
+  database: constants.DB_NAME,
   password: constants.DB_PASSWORD,
   port: constants.DB_PORT,
+  ssl: { rejectUnauthorized: false },
 });
 
 // Log when connected to the database
-pool.on('connect', () => {
-  console.log('Connected to the PostgreSQL database');
+pool.on("connect", () => {
+  console.log("Connected to the PostgreSQL database");
 });
 
 // Utility function to handle database queries with optional error logging
@@ -53,7 +55,7 @@ const query = async (text, params) => {
   try {
     return await pool.query(text, params);
   } catch (err) {
-    console.error('Database query error:', err);
+    console.error("Database query error:", err);
     throw err;
   }
 };
@@ -61,5 +63,5 @@ const query = async (text, params) => {
 module.exports = {
   createDatabase,
   query,
-  pool
+  pool,
 };
