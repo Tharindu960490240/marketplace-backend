@@ -2,13 +2,18 @@ const nodemailer = require("nodemailer");
 const constants = require("../config/const");
 
 const transporter = nodemailer.createTransport({
-  host: "smtp-relay.brevo.com",
-  port: 587,
-  secure: false,
+  host: "smtp.zoho.com",
+  port: 465,
+  secure: true,
   auth: {
-    user: constants.EMAIL_USER, 
+    user: constants.EMAIL_USER,
     pass: constants.EMAIL_PASS,
   },
+  tls: {
+    rejectUnauthorized: false,
+    minVersion: "TLSv1.2",
+  },
+  connectionTimeout: 10000,
 });
 
 // Verify connection on startup
@@ -24,7 +29,7 @@ transporter.verify((error, success) => {
 const sendEmail = async ({ email, subject, text, html }) => {
   try {
     const mailOptions = {
-      from: `"Agri Link Services Marketplace" <${constants.EMAIL}>`,
+      from: `"Agri Link Services Marketplace" <${constants.EMAIL_USER}>`,
       to: email,
       subject,
       text,
