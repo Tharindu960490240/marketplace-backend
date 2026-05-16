@@ -9,7 +9,7 @@ apiKey.apiKey = process.env.BREVO_API_KEY;
 const tranEmailApi = new SibApiV3Sdk.TransactionalEmailsApi();
 
 // Send email
-const sendEmail = async ({ email, subject, text, html }) => {
+const sendEmail = async ({ email, subject, html }) => {
   try {
     const response = await tranEmailApi.sendTransacEmail({
       sender: {
@@ -22,7 +22,6 @@ const sendEmail = async ({ email, subject, text, html }) => {
         },
       ],
       subject: subject,
-      textContent: text || "",
       htmlContent: html || "",
     });
 
@@ -32,7 +31,7 @@ const sendEmail = async ({ email, subject, text, html }) => {
       data: response,
     };
   } catch (error) {
-    console.error("Email send failed:", error.response?.body || error.message);
+    console.error("Email send failed:", error.response?.body || error);
     throw new Error("Failed to send email");
   }
 };

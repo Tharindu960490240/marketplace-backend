@@ -22,13 +22,12 @@ transporter.verify((error, success) => {
 });
 
 // Send email
-const sendEmail = async ({ email, subject, text, html }) => {
+const sendEmail = async ({ email, subject, html }) => {
   try {
     const mailOptions = {
       from: `"Agri Link Services Marketplace" <${process.env.EMAIL_USER}>`,
       to: email,
       subject,
-      text,
       html,
     };
 
