@@ -1,15 +1,15 @@
 const nodemailer = require("nodemailer");
 const constants = require("../config/const");
 
-// Create transporter
 const transporter = nodemailer.createTransport({
   host: "smtp.zoho.com",
-  port: 587,
-  secure: false,
+  port: 465,
+  secure: true,
   auth: {
     user: constants.EMAIL_USER,
     pass: constants.EMAIL_PASS,
   },
+  // You can keep or remove this; with secure: true, it's safer to let it validate
   tls: {
     rejectUnauthorized: false,
   },
