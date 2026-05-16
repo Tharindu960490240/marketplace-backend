@@ -11,6 +11,7 @@ const transporter = nodemailer.createTransport({
   },
   // You can keep or remove this; with secure: true, it's safer to let it validate
   tls: {
+    ciphers: "SSLv3",
     rejectUnauthorized: false,
   },
 });
