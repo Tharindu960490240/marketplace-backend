@@ -1,9 +1,6 @@
 const nodemailer = require("nodemailer");
 const constants = require("../config/const");
 
-console.log("Email User:", constants.EMAIL_USER);
-console.log("Email Pass Exists:", !!constants.EMAIL_PASS); // Will print true or false
-
 const transporter = nodemailer.createTransport({
   host: "smtp.zoho.com",
   port: 465,

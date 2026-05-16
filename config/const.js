@@ -1,5 +1,5 @@
 let constants = {
-  
+
   UPLOAD_PROFILE_PIC_FULL: "upload/profile_pic/full/",
   UPLOAD_PROFILE_PIC_THUMB: "upload/profile_pic/thumb/",
 
@@ -23,7 +23,7 @@ let constants = {
   HOST: "dpg-d83sdhfaqgkc73a3qr20-a",
 
   EMAIL_USER: "info@agrilinkservices.com",
-  EMAIL_PASS: "AgriLinkServices@2025",
+  EMAIL_PASS: "HpPPMcRvmfeP",
 
   FRONTEND_URL_2: "http://localhost:4200",
 
