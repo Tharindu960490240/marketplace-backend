@@ -39,7 +39,7 @@ let constants = {
   GMAIL_PASS: "rbjzfwvviiyxqxer",
 
   SENDGRID_API_KEY:
-    "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",
+    "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",
 };
 
 module.exports = Object.freeze(constants);
