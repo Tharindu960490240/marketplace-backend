@@ -37,6 +37,9 @@ let constants = {
 
   GMAIL_USER: "infor.quickdrop@gmail.com",
   GMAIL_PASS: "rbjzfwvviiyxqxer",
+
+  SENDGRID_API_KEY:
+    "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",
 };
 
 module.exports = Object.freeze(constants);
