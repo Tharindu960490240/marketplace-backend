@@ -7,13 +7,20 @@ let constants = {
   DRIVER_COMMISSION_PERCENT: 15,
 
   PORT: 3200,
-  DB_USER: "postgres",
-  DB_PASSWORD: "9761",
-  DB_HOST: "localhost",
+  // DB_USER: "postgres",
+  // DB_HOST: "localhost",
+  // DB_PORT: 5432,
+  // DB_PASSWORD: "9761",
+  // HOST: "192.168.5.18,
+  DEFAULT_DB: "postgres",
+
+  DB_HOST: "dpg-d83sdhfaqgkc73a3qr20-a.virginia-postgres.render.com",
   DB_PORT: 5432,
   DB_NAME: "sathwa_sewana",
-  DEFAULT_DB: "postgres",
-  HOST: "192.168.5.18",
+  DB_USER: "marketplace_user",
+  DB_PASSWORD: "eXhP7g0Nq16FstcAm2XSIZEk6MwxM4Sw",
+
+  HOST: "dpg-d83sdhfaqgkc73a3qr20-a",
 
   EMAIL_USER: "info@agrilinkservices.com",
   EMAIL_PASS: "AgriLinkServices@2025",
