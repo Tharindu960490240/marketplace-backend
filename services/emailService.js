@@ -7,7 +7,7 @@ const transporter = nodemailer.createTransport({
   secure: false, // IMPORTANT: false for 587
   auth: {
     user: constants.EMAIL_USER,
-    pass: constants.EMAIL_PASS, // use App Password
+    pass: '3jm2a91By6cg', // use App Password
   },
   tls: {
     minVersion: "TLSv1.2",
