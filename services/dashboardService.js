@@ -97,6 +97,7 @@ const getAdminDashboardStatsService = async () => {
     SELECT u.id, u.first_name AS name, COUNT(a.id)::int AS ads
     FROM users u
     LEFT JOIN ads a ON a.user_id = u.id
+    WHERE u.role != 'admin'
     GROUP BY u.id
     ORDER BY ads DESC
     LIMIT 5
