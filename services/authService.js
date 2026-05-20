@@ -195,10 +195,6 @@ const updateProfileImage = async (userId, file) => {
     const imageUrl = file.location;
     const imageKey = file.key;
 
-    console.log("New profile image uploaded:", {
-      imageUrl,
-      imageKey,
-    });
     // ===============================
     // UPDATE DATABASE
     // ===============================
