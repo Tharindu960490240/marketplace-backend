@@ -2,8 +2,12 @@ const pool = require("../config/database");
 const crypto = require("crypto");
 const { hashPassword, comparePassword } = require("../utils/hash");
 
-const fs = require("fs");
-const path = require("path");
+const {
+  DeleteObjectCommand,
+} = require("@aws-sdk/client-s3");
+
+const { s3 } = require("../middlewares/upload");
+
 
 // ================= REGISTER USER =================
 const registerUser = async (data) => {
@@ -155,45 +159,70 @@ const updateProfile = async (userId, data) => {
 // ================= UPDATE PROFILE IMAGE =================
 const updateProfileImage = async (userId, file) => {
   try {
+
     // ===============================
-    // GET USER FIRST (to delete old image)
+    // GET OLD IMAGE
     // ===============================
     const userResult = await pool.query(
-      `SELECT profile_image FROM users WHERE id=$1`,
-      [userId],
+      `
+      SELECT
+        profile_image,
+        profile_image_key
+      FROM users
+      WHERE id = $1
+      `,
+      [userId]
     );
 
     const user = userResult.rows[0];
 
     // ===============================
-    // DELETE OLD IMAGE IF EXISTS
+    // DELETE OLD IMAGE FROM S3
     // ===============================
-    if (user?.profile_image) {
-      const oldPath = path.join(__dirname, "..", user.profile_image);
+    if (user?.profile_image_key) {
 
-      if (fs.existsSync(oldPath)) {
-        fs.unlinkSync(oldPath);
-      }
+      await s3.send(
+        new DeleteObjectCommand({
+          Bucket: process.env.AWS_BUCKET_NAME,
+          Key: user.profile_image_key,
+        })
+      );
     }
 
     // ===============================
-    // NEW IMAGE PATH (from multer)
-    // file.path already includes folder/userId/profile.jpg
+    // NEW IMAGE VALUES
     // ===============================
-    const imageUrl = file.path.replace(/\\/g, "/");
+    const imageUrl = file.location;
+    const imageKey = file.key;
 
+    console.log("New profile image uploaded:", {
+      imageUrl,
+      imageKey,
+    });
     // ===============================
-    // UPDATE DB
+    // UPDATE DATABASE
     // ===============================
     const result = await pool.query(
-      `UPDATE users
-       SET profile_image=$1, updated_at=NOW()
-       WHERE id=$2
-       RETURNING id, profile_image`,
-      [imageUrl, userId],
+      `
+      UPDATE users
+      SET
+        profile_image = $1,
+        profile_image_key = $2,
+        updated_at = NOW()
+      WHERE id = $3
+      RETURNING
+        id,
+        profile_image
+      `,
+      [
+        imageUrl,
+        imageKey,
+        userId,
+      ]
     );
 
     return result.rows[0];
+
   } catch (err) {
     throw new Error(err.message);
   }

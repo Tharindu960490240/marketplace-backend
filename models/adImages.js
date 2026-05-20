@@ -11,6 +11,7 @@ const createAdImagesTable = async () => {
         ON DELETE CASCADE,
 
       image_url TEXT NOT NULL,
+      image_key TEXT,
 
       is_primary BOOLEAN DEFAULT FALSE,
 

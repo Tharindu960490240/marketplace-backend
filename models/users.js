@@ -12,6 +12,7 @@ const createUserTable = async () => {
 
       phone VARCHAR(20),
       profile_image TEXT,
+      profile_image_key TEXT,
 
       role VARCHAR(20) DEFAULT 'user'
         CHECK (role IN ('user', 'admin')),

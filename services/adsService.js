@@ -1,7 +1,10 @@
 const pool = require("../config/database");
-const fs = require("fs");
 const { getUserById } = require("./authService");
 require("dotenv").config();
+
+const { DeleteObjectCommand } = require("@aws-sdk/client-s3");
+
+const { s3 } = require("../middlewares/upload");
 
 // ================= CREATE AD =================
 const createAdService = async (data, userId) => {
@@ -51,17 +54,22 @@ const createAdService = async (data, userId) => {
 // ================= UPLOAD IMAGES =================
 const uploadAdImagesService = async (adId, files) => {
   const queries = files.map((file, index) => {
-    const imageUrl = file.path.replace(/\\/g, "/");
+    const imageUrl = file.location;
+    const imageKey = file.key;
 
     return pool.query(
-      `INSERT INTO ad_images (ad_id, image_url, is_primary)
-       VALUES ($1,$2,$3)
-       RETURNING *`,
-      [adId, imageUrl, index === 0],
+      `
+      INSERT INTO ad_images
+      (ad_id, image_url, image_key, is_primary)
+      VALUES ($1,$2,$3,$4)
+      RETURNING *
+      `,
+      [adId, imageUrl, imageKey, index === 0],
     );
   });
 
   const results = await Promise.all(queries);
+
   return results.map((r) => r.rows[0]);
 };
 
@@ -536,6 +544,7 @@ const updateAdService = async (id, userId, data) => {
 
 // ================= DELETE AD =================
 const deleteAdService = async (adId, userId) => {
+
   const adCheck = await pool.query(
     "SELECT * FROM ads WHERE id=$1 AND user_id=$2",
     [adId, userId],
@@ -545,11 +554,46 @@ const deleteAdService = async (adId, userId) => {
     throw new Error("Ad not found or unauthorized");
   }
 
-  await pool.query("DELETE FROM ads WHERE id=$1", [adId]);
+  // ===============================
+  // GET ALL AD IMAGES
+  // ===============================
+  const imagesResult = await pool.query(
+    `
+    SELECT image_key
+    FROM ad_images
+    WHERE ad_id = $1
+    `,
+    [adId],
+  );
 
-  // delete uploaded folder (optional safety)
-  const folderPath = `uploads/ads/${adId}`;
-  fs.rmSync(folderPath, { recursive: true, force: true });
+  // ===============================
+  // DELETE FROM S3
+  // ===============================
+  for (const image of imagesResult.rows) {
+
+    if (image.image_key) {
+
+      await s3.send(
+        new DeleteObjectCommand({
+          Bucket: process.env.AWS_BUCKET_NAME,
+          Key: image.image_key,
+        }),
+      );
+    }
+  }
+
+  // ===============================
+  // DELETE DB RECORDS
+  // ===============================
+  await pool.query(
+    "DELETE FROM ad_images WHERE ad_id=$1",
+    [adId],
+  );
+
+  await pool.query(
+    "DELETE FROM ads WHERE id=$1",
+    [adId],
+  );
 
   return true;
 };

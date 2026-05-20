@@ -1,54 +1,115 @@
+require("dotenv").config();
+
 const multer = require("multer");
-const fs = require("fs");
+const multerS3 = require("multer-s3");
 const path = require("path");
+
+const { S3Client } = require("@aws-sdk/client-s3");
+
+/* ===============================
+   VALIDATE ENV (DEBUG SAFE)
+=============================== */
+if (
+  !process.env.AWS_ACCESS_KEY_ID ||
+  !process.env.AWS_SECRET_ACCESS_KEY ||
+  !process.env.AWS_BUCKET_NAME
+) {
+  console.warn("Missing AWS environment variables");
+}
+
+/* ===============================
+   AWS S3 CONFIG
+=============================== */
+const s3 = new S3Client({
+  region: process.env.AWS_REGION,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  },
+});
+
+/* ===============================
+   FILE FILTER
+=============================== */
+const fileFilter = (req, file, cb) => {
+  const allowedTypes = [
+    "image/jpeg",
+    "image/jpg",
+    "image/png",
+    "image/webp",
+  ];
+
+  if (allowedTypes.includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(new Error("Only JPG, PNG and WEBP images are allowed"), false);
+  }
+};
 
 /* ===============================
    CREATE UPLOADER FACTORY
 =============================== */
-const createUploader = (folder, type = "multi") => {
-  const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-      let finalPath = `uploads/${folder}`;
+const createUploader = (folder) => {
+  return multer({
+    storage: multerS3({
+      s3,
 
-      // PROFILE: uploads/profile_pic/{userId}
-      if (folder === "profile_pic") {
-        const userId = req.user?.id || "temp";
-        finalPath = `uploads/profile_pic/${userId}`;
-      }
+      bucket: process.env.AWS_BUCKET_NAME,
 
-      // ADS: uploads/ads/{adId}
-      // inside multer destination
-      if (folder === "ads") {
-        const adId = req.params.adId || "temp";
-        finalPath = `uploads/ads/${adId}`;
-      }
 
-      // create folder if not exists
-      if (!fs.existsSync(finalPath)) {
-        fs.mkdirSync(finalPath, { recursive: true });
-      }
+      contentType: multerS3.AUTO_CONTENT_TYPE,
 
-      cb(null, finalPath);
-    },
+      metadata: (req, file, cb) => {
+        cb(null, {
+          fieldName: file.fieldname,
+        });
+      },
 
-    filename: (req, file, cb) => {
-      const ext = path.extname(file.originalname);
+      key: (req, file, cb) => {
+        const ext = path.extname(file.originalname);
 
-      // ================= PROFILE IMAGE (overwrite style)
-      if (folder === "profile_pic") {
-        cb(null, "profile" + ext);
-      }
+        let filePath = "";
 
-      // ================= ADS IMAGES (unique names)
-      else {
-        const uniqueName = Date.now() + "-" + Math.round(Math.random() * 1e9);
+        /* ===============================
+           PROFILE IMAGE
+        =============================== */
+        if (folder === "profile_pic") {
+          const userId = req.user?.id || "temp";
+          filePath = `profile_pic/${userId}/profile-${Date.now()}${ext}`;
+        }
 
-        cb(null, uniqueName + ext);
-      }
+        /* ===============================
+           ADS IMAGES
+        =============================== */
+        else if (folder === "ads") {
+          const adId = req.params.adId || "temp";
+
+          const uniqueName =
+            Date.now() + "-" + Math.round(Math.random() * 1e9);
+
+          filePath = `ads/${adId}/${uniqueName}${ext}`;
+        }
+
+        /* ===============================
+           DEFAULT
+        =============================== */
+        else {
+          const uniqueName =
+            Date.now() + "-" + Math.round(Math.random() * 1e9);
+
+          filePath = `${folder}/${uniqueName}${ext}`;
+        }
+
+        cb(null, filePath);
+      },
+    }),
+
+    fileFilter,
+
+    limits: {
+      fileSize: 5 * 1024 * 1024, // 5MB
     },
   });
-
-  return multer({ storage });
 };
 
 /* ===============================
@@ -57,7 +118,11 @@ const createUploader = (folder, type = "multi") => {
 const uploadAds = createUploader("ads");
 const uploadProfile = createUploader("profile_pic");
 
+/* ===============================
+   EXPORTS
+=============================== */
 module.exports = {
   uploadAds,
   uploadProfile,
+  s3,
 };
