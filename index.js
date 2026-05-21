@@ -54,11 +54,7 @@ app.use(
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: [
       "Content-Type",
-      "Authorization",
-      "X-Requested-With",
-      "Accept",
-      "Origin",
-      "ngrok-skip-browser-warning",
+      "Authorization"
     ],
     credentials: true
   })
