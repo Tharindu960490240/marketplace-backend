@@ -45,10 +45,12 @@ const PORT = process.env.PORT || 3200;
 // ================= MIDDLEWARE =================
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
 app.use(
   cors({
-    origin: "*", //change in production
+    origin: [
+      "http://localhost:4200",
+      "https://marketplace-frontend-tawny.vercel.app"
+    ],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: [
       "Content-Type",
@@ -58,7 +60,8 @@ app.use(
       "Origin",
       "ngrok-skip-browser-warning",
     ],
-  }),
+    credentials: true
+  })
 );
 
 // ================= STATIC FILES =================
