@@ -38,8 +38,12 @@ const buildEmailTemplate = ({ title, content, action }) => {
                 </a>
               </div>
 
-              <p style="font-size:13px;color:#888;line-height:1.6;">
-                    If the button doesn’t work, copy and paste this link into your browser:
+              <!-- Bilingual Copy-Paste Instructions -->
+              <p style="font-size:13px;color:#888;line-height:1.6;margin-bottom:4px;">
+                If the button doesn’t work, copy and paste this link into your browser:
+              </p>
+              <p style="font-size:13px;color:#888;line-height:1.6;margin-top:0;">
+                ඉහත බොත්තම ක්‍රියා නොකරන්නේ නම්, මෙම සබැඳිය (Link) පිටපත් කර ඔබේ වෙබ් බ්‍රවුසරයට ඇතුලත් කරන්න:
               </p>
 
               <p style="font-size:12px;color:#2196f3;word-break:break-all;">
@@ -51,8 +55,9 @@ const buildEmailTemplate = ({ title, content, action }) => {
         </div>
 
         <!-- Footer -->
-        <div style="background:#f4f6f8;padding:20px;text-align:center;font-size:12px;color:#888;">
-          © ${new Date().getFullYear()} Agri link services marketplace. All rights reserved.
+        <div style="background:#f4f6f8;padding:20px;text-align:center;font-size:12px;color:#888;line-height:1.6;">
+          © ${new Date().getFullYear()} Agri Link Services Marketplace. All rights reserved.<br>
+          සියලුම හිමිකම් ඇවිරිණි.
         </div>
 
       </div>

@@ -34,22 +34,35 @@ const register = async (req, res) => {
     const verifyUrl = `${process.env.FRONTEND_URL}/verify/${verificationToken}`;
 
     const html = buildEmailTemplate({
-      title: "Verify your account",
-      content: `<h3 style="margin-top:0;">Hi ${req.body.first_name || "there"},</h3>
-      <p style="font-size:15px;line-height:1.6;color:#555;">
-      Thank you for joining <strong>Agri link services marketplace</strong> - Sri Lanka’s trusted animal marketplace.
-      We are excited to have you onboard!</p>
-      <p style="font-size:15px;line-height:1.6;color:#555;">
-      To complete your registration, please verify your email address by clicking the button below.</p>`,
+      title: "Verify your account | ගිණුම තහවුරු කරන්න",
+      content: `
+      <h3 style="margin-top:0;">Hi ${req.body.first_name || "there"} / ආයුබෝවන්,</h3>
+      
+      <!-- English Section -->
+      <div style="font-size:15px; line-height:1.6; color:#555; margin-bottom: 20px;">
+        <p>Thank you for joining <strong>Agri Link Services Marketplace</strong> - Sri Lanka’s trusted animal marketplace. We are excited to have you onboard!</p>
+        <p>To complete your registration, please verify your email address by clicking the button below.</p>
+      </div>
+      
+      <hr style="border:none; border-top:1px solid #eee; margin:20px 0;" />
+      
+      <!-- Sinhala Section -->
+      <div style="font-size:15px; line-height:1.6; color:#555;">
+        <p>ශ්‍රී ලංකාවේ විශ්වාසදායී සත්ව සහ කෘෂිකාර්මික වෙළඳපොළ වන <strong>Agri Link Services Marketplace</strong> සමඟ සම්බන්ධ වීම පිළිබඳව ඔබට ස්තුතියි!</p>
+        <p>ඔබේ ලියාපදිංචිය සම්පූර්ණ කිරීම සඳහා, කරුණාකර පහත බොත්තම ක්ලික් කර ඔබගේ විද්‍යුත් තැපැල් ලිපිනය (Email) තහවුරු කරන්න.</p>
+      </div>
+      <br>
+      `,
       action: {
-        text: "Verify My Account",
+        text: "Verify Account / ගිණුම තහවුරු කරන්න",
         url: verifyUrl,
       },
     });
 
     await sendEmail({
       email: req.body.email,
-      subject: "Verify your account - Agri link services marketplace",
+      subject:
+        "Verify your account - Agri Link Services Marketplace | ගිණුම තහවුරු කරන්න",
       html: html,
     });
 
@@ -137,22 +150,35 @@ const resendVerificationController = async (req, res) => {
     const verifyUrl = `${process.env.FRONTEND_URL}/verify/${token}`;
 
     const html = buildEmailTemplate({
-      title: "Verify your account",
-      content: `<h3 style="margin-top:0;">Hi ${user.first_name || "there"},</h3>
-      <p style="font-size:15px;line-height:1.6;color:#555;">
-      Thank you for joining <strong>Agri link services marketplace</strong> - Sri Lanka’s trusted animal marketplace.
-      We are excited to have you onboard!</p>
-      <p style="font-size:15px;line-height:1.6;color:#555;">
-      To complete your registration, please verify your email address by clicking the button below.</p>`,
+      title: "Verify your account | ගිණුම තහවුරු කරන්න",
+      content: `
+      <h3 style="margin-top:0;">Hi ${user.first_name || "there"} / ආයුබෝවන්,</h3>
+      
+      <!-- English Section -->
+      <div style="font-size:15px; line-height:1.6; color:#555; margin-bottom: 20px;">
+        <p>Thank you for joining <strong>Agri Link Services Marketplace</strong> - Sri Lanka’s trusted animal marketplace. We are excited to have you onboard!</p>
+        <p>To complete your registration, please verify your email address by clicking the button below.</p>
+      </div>
+      
+      <hr style="border:none; border-top:1px solid #eee; margin:20px 0;" />
+      
+      <!-- Sinhala Section -->
+      <div style="font-size:15px; line-height:1.6; color:#555;">
+        <p>ශ්‍රී ලංකාවේ විශ්වාසදායී සත්ව සහ කෘෂිකාර්මික වෙළඳපොළ වන <strong>Agri Link Services Marketplace</strong> සමඟ සම්බන්ධ වීම පිළිබඳව ඔබට ස්තුතියි!</p>
+        <p>ඔබේ ලියාපදිංචිය සම්පූර්ණ කිරීම සඳහා, කරුණාකර පහත බොත්තම ක්ලික් කර ඔබගේ විද්‍යුත් තැපැල් ලිපිනය (Email) තහවුරු කරන්න.</p>
+      </div>
+      <br>
+      `,
       action: {
-        text: "Verify My Account",
+        text: "Verify Account / ගිණුම තහවුරු කරන්න",
         url: verifyUrl,
       },
     });
 
     await sendEmail({
       email: user.email,
-      subject: "Verify your account - Agri link services marketplace",
+      subject:
+        "Verify your account - Agri Link Services Marketplace | ගිණුම තහවුරු කරන්න",
       html: html,
     });
 
@@ -198,60 +224,64 @@ const updateUserStatusController = async (req, res) => {
     const saved_user = await getUserByEmail(req.body.email);
 
     if (req.body.status == "suspended" || req.body.status == "active") {
+      const isSuspended = req.body.status === "suspended";
+
       const html = buildEmailTemplate({
-        title:
-          req.body.status === "suspended"
-            ? "Account Suspended"
-            : "Account Activated",
-        content:
-          req.body.status === "suspended"
-            ? `
-      <h3 style="margin-top:0;">Hi ${saved_user.first_name || "there"},</h3>
+        title: isSuspended
+          ? "Account Suspended | ගිණුම අත්හිටුවා ඇත"
+          : "Account Activated | ගිණුම සක්‍රීය කර ඇත",
+        content: isSuspended
+          ? `
+          <h3 style="margin-top:0;">Hi ${saved_user.first_name || "there"} / ආයුබෝවන්,</h3>
 
-      <p style="font-size:15px;line-height:1.6;color:#555;">
-        Your Agri link services marketplace account has been <strong>suspended</strong> due to a violation of our platform policies.
-      </p>
+          <!-- English Section -->
+          <div style="font-size:15px;line-height:1.6;color:#555;">
+            <p>Your Agri Link Services Marketplace account has been <strong>suspended</strong> due to a violation of our platform policies.</p>
+            <p>If you believe this was a mistake or need further clarification, please contact our support team.</p>
+            <p>Email: support@sathwasewana.com</p>
+            <p style="margin-top:15px;color:#999;">Thank you for your understanding.</p>
+          </div>
 
-      <p style="font-size:15px;line-height:1.6;color:#555;">
-        If you believe this was a mistake or need further clarification, please contact our support team.
-      </p>
+          <hr style="border:none; border-top:1px solid #eee; margin:20px 0;" />
 
-      <p style="font-size:15px;line-height:1.6;color:#555;">
-         Email: support@sathwasewana.com
-      </p>
+          <!-- Sinhala Section -->
+          <div style="font-size:15px;line-height:1.6;color:#555;">
+            <p>අපගේ වේදිකාවේ නීති සහ මාර්ගෝපදේශ උල්ලංඝනය කිරීම හේතුවෙන් ඔබේ Agri Link Services Marketplace ගිණුම මේ වන විට <strong>අත්හිටුවා (suspended)</strong> ඇත.</p>
+            <p>මෙය වැරදීමකින් සිදුවූවක් යැයි ඔබ සිතන්නේ නම් හෝ මේ පිළිබඳව වැඩිදුර තොරතුරු අවශ්‍ය නම්, කරුණාකර අපගේ සහාය කණ්ඩායම සම්බන්ධ කර ගන්න.</p>
+            <p>විද්‍යුත් තැපෑල: support@sathwasewana.com</p>
+            <p style="margin-top:15px;color:#999;">ඔබගේ සහයෝගීතාවයට ස්තුතියි.</p>
+          </div>
+        `
+          : `
+          <h3 style="margin-top:0;">Hi ${saved_user.first_name || "there"} / ආයුබෝවන්,</h3>
 
-      <p style="margin-top:20px;color:#999;">
-        Thank you for your understanding.
-      </p>
-    `
-            : `
-      <h3 style="margin-top:0;">Hi ${saved_user.first_name || "there"},</h3>
+          <!-- English Section -->
+          <div style="font-size:15px;line-height:1.6;color:#555;">
+            <p>Great news! Your Agri Link Services Marketplace account is now <strong>active</strong>.</p>
+            <p>You can now access all features of the platform and continue using our services without any restrictions.</p>
+            <p>If you have any questions or need assistance, feel free to contact our support team anytime.</p>
+            <p>Email: support@sathwasewana.com</p>
+            <p style="margin-top:15px;color:#999;">Thank you for being part of Agri Link Services Marketplace.</p>
+          </div>
 
-      <p style="font-size:15px;line-height:1.6;color:#555;">
-        Great news!  Your Agri link services marketplace account is now <strong>active</strong>.
-      </p>
+          <hr style="border:none; border-top:1px solid #eee; margin:20px 0;" />
 
-      <p style="font-size:15px;line-height:1.6;color:#555;">
-        You can now access all features of the platform and continue using our services without any restrictions.
-      </p>
-
-      <p style="font-size:15px;line-height:1.6;color:#555;">
-        If you have any questions or need assistance, feel free to contact our support team anytime.
-      </p>
-
-      <p style="font-size:15px;line-height:1.6;color:#555;">
-         Email: support@sathwasewana.com
-      </p>
-
-      <p style="margin-top:20px;color:#999;">
-        Thank you for being part of Agri link services marketplace.
-      </p>
-    `,
+          <!-- Sinhala Section -->
+          <div style="font-size:15px;line-height:1.6;color:#555;">
+            <p>සුභ ආරංචියක්! ඔබේ Agri Link Services Marketplace ගිණුම දැන් නැවතත් <strong>සක්‍රීය (active)</strong> කර ඇත.</p>
+            <p>ඔබට දැන් කිසිදු බාධාවකින් තොරව වේදිකාවේ සියලුම පහසුකම් භාවිතා කිරීමට සහ අපගේ සේවාවන් ලබා ගැනීමට හැකිය.</p>
+            <p>ඔබට කිසියම් ප්‍රශ්නයක් ඇත්නම් හෝ සහාය අවශ්‍ය නම්, ඕනෑම වේලාවක අපගේ සහාය කණ්ඩායම සම්බන්ධ කර ගන්න.</p>
+            <p>විද්‍යුත් තැපෑල: support@sathwasewana.com</p>
+            <p style="margin-top:15px;color:#999;">Agri Link Services Marketplace සමඟ රැඳී සිටීම පිළිබඳව ස්තුතියි.</p>
+          </div>
+        `,
       });
 
       await sendEmail({
         email: saved_user.email,
-        subject: "Account Suspended",
+        subject: isSuspended
+          ? "Account Suspended - Agri Link Services Marketplace | ගිණුම අත්හිටුවා ඇත"
+          : "Account Activated - Agri Link Services Marketplace | ගිණුම සක්‍රීය කර ඇත",
         html: html,
       });
     }
@@ -276,22 +306,35 @@ const sendPasswordResetLink = async (req, res) => {
     const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
 
     const html = buildEmailTemplate({
-      title: "Password Reset Request",
+      title: "Password Reset Request | මුරපදය යළි පිහිටුවීම",
       content: `
-              <h3 style="margin-top:0;">Hi ${user.first_name || "there"},</h3>
-              <p style="font-size:15px;line-height:1.6;color:#555;">
-              We received a request to reset your password for your <strong>Agri link services marketplace</strong> account</p>
-              <p style="font-size:15px;line-height:1.6;color:#555;">
-              Click the button below to reset your password. This link will expire in <strong>1 hour</strong>.</p>`,
+      <h3 style="margin-top:0;">Hi ${user.first_name || "there"} / ආයුබෝවන්,</h3>
+      
+      <!-- English Section -->
+      <div style="font-size:15px; line-height:1.6; color:#555; margin-bottom: 20px;">
+        <p>We received a request to reset the password for your <strong>Agri Link Services Marketplace</strong> account.</p>
+        <p>Click the button below to reset your password. This link will expire in <strong>1 hour</strong>.</p>
+      </div>
+      
+      <hr style="border:none; border-top:1px solid #eee; margin:20px 0;" />
+      
+      <!-- Sinhala Section -->
+      <div style="font-size:15px; line-height:1.6; color:#555;">
+        <p>ඔබගේ <strong>Agri Link Services Marketplace</strong> ගිණුමේ මුරපදය (Password) යළි පිහිටුවීම සඳහා අපට ඉල්ලීමක් ලැබී ඇත.</p>
+        <p>ඔබගේ මුරපදය වෙනස් කිරීමට පහත බොත්තම ක්ලික් කරන්න. මෙම සබැඳිය (Link) <strong>පැය 1කින්</strong> කල් ඉකුත් වනු ඇත.</p>
+      </div>
+      <br>
+      `,
       action: {
-        text: "Reset My Password",
+        text: "Reset My Password / මුරපදය යළි පිහිටුවන්න",
         url: resetUrl,
       },
     });
 
     await sendEmail({
       email: user.email,
-      subject: "Reset Your Password - Agri link services marketplace",
+      subject:
+        "Reset Your Password - Agri Link Services Marketplace | මුරපදය යළි පිහිටුවීම",
       html: html,
     });
 
@@ -332,31 +375,34 @@ const deleteUserAccount = async (req, res) => {
 
     // Send farewell email AFTER deletion
     const html = buildEmailTemplate({
-      title: "Account Deleted",
+      title: "Account Deleted | ගිණුම ඉවත් කර ඇත",
       content: `
-        <h3 style="margin-top:0;">Goodbye ${deletedUser.first_name || "there"},</h3>
+        <h3 style="margin-top:0;">Goodbye ${deletedUser.first_name || "there"} / සුභ ගමන්,</h3>
 
-        <p style="font-size:15px;line-height:1.6;color:#555;">
-          Your <strong>Agri link services marketplace</strong> account has been permanently deleted as requested.
-        </p>
+        <!-- English Section -->
+        <div style="font-size:15px;line-height:1.6;color:#555;">
+          <p>Your <strong>Agri Link Services Marketplace</strong> account has been permanently deleted as requested.</p>
+          <p>We’re sorry to see you go. All your data has been removed from our system.</p>
+          <p>If this was a mistake or you change your mind, you can always create a new account.</p>
+          <p style="margin-top:15px;color:#999;">Thank you for being part of our platform.</p>
+        </div>
 
-        <p style="font-size:15px;line-height:1.6;color:#555;">
-          We’re sorry to see you go. All your data has been removed from our system.
-        </p>
+        <hr style="border:none; border-top:1px solid #eee; margin:20px 0;" />
 
-        <p style="font-size:15px;line-height:1.6;color:#555;">
-          If this was a mistake or you change your mind, you can always create a new account.
-        </p>
-
-        <p style="margin-top:20px;color:#999;">
-          Thank you for being part of our platform.
-        </p>
+        <!-- Sinhala Section -->
+        <div style="font-size:15px;line-height:1.6;color:#555;">
+          <p>ඔබගේ ඉල්ලීම පරිදි ඔබේ <strong>Agri Link Services Marketplace</strong> ගිණුම ස්ථිරවම ඉවත් කර (deleted) ඇත.</p>
+          <p>ඔබ අපෙන් සමුගැනීම පිළිබඳව කණගාටු වන අතර, ඔබගේ සියලුම දත්ත අපගේ පද්ධතියෙන් ඉවත් කර ඇති බව දන්වා සිටිමු.</p>
+          <p>මෙය වැරදීමකින් සිදුවූවක් නම් හෝ ඔබගේ අදහස වෙනස් වුවහොත්, ඔබට ඕනෑම වේලාවක නව ගිණුමක් ආරම්භ කළ හැකිය.</p>
+          <p style="margin-top:15px;color:#999;">මෙතෙක් කල් අපගේ වේදිකාව සමඟ රැඳී සිටීම පිළිබඳව ඔබට ස්තුතියි.</p>
+        </div>
       `,
     });
 
     await sendEmail({
       email: deletedUser.email,
-      subject: "Your Account Has Been Deleted - Agri link services marketplace",
+      subject:
+        "Your Account Has Been Deleted - Agri Link Services Marketplace | ගිණුම ඉවත් කර ඇත",
       html,
     });
 
