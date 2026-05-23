@@ -3,8 +3,6 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 
-
-
 const cron = require("node-cron");
 const downgradeExpiredUsers = require("./jobs/subscriptionJob.js");
 
@@ -37,8 +35,6 @@ const { createSubscriptionsTable } = require("./models/subscriptions.js");
 const { createSupportTables } = require("./models/support.js");
 const { createNotificationTable } = require("./models/notification.js");
 
-
-
 const app = express();
 const PORT = process.env.PORT || 3200;
 
@@ -49,15 +45,13 @@ app.use(
   cors({
     origin: [
       "http://localhost:4200",
-      "https://marketplace-frontend-tawny.vercel.app"
+      "http://52.221.196.150",
+      "http://ec2-52-221-196-150.ap-southeast-1.compute.amazonaws.com",
     ],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: [
-      "Content-Type",
-      "Authorization"
-    ],
-    credentials: true
-  })
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  }),
 );
 
 // ================= STATIC FILES =================
