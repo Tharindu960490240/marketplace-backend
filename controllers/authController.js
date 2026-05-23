@@ -29,6 +29,33 @@ require("dotenv").config();
 // ================= REGISTER =================
 const register = async (req, res) => {
   try {
+    const isFirstNameValid =
+      /^[\p{L}]+(?:\s[\p{L}]+)*$/u.test(req.body.first_name) &&
+      req.body.first_name.length > 0;
+
+    const isLastNameValid =
+      /^[\p{L}]+(?:\s[\p{L}]+)*$/u.test(req.body.last_name) &&
+      req.body.last_name.length > 0;
+
+    const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(req.body.email);
+
+    const isContactNoValid = /^\d{10}$/.test(req.body.phone);
+
+    const isPasswordValid =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
+        req.body.password,
+      );
+
+    if (
+      !isFirstNameValid ||
+      !isLastNameValid ||
+      !isEmailValid ||
+      !isContactNoValid ||
+      !isPasswordValid
+    ) {
+      return res.status(400).json({ error: "Invalid input data" });
+    }
+
     const { user, verificationToken } = await registerUser(req.body);
 
     const verifyUrl = `${process.env.FRONTEND_URL}/verify/${verificationToken}`;
