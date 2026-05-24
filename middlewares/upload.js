@@ -1,20 +1,18 @@
 require("dotenv").config();
 
 const multer = require("multer");
-const multerS3 = require("multer-s3-transform");
+const multerS3 = require("multer-s3");
 const path = require("path");
-const sharp = require("sharp");
 
 const { S3Client } = require("@aws-sdk/client-s3");
 
 /* ===============================
-   VALIDATE ENV
+   VALIDATE ENV (DEBUG SAFE)
 =============================== */
 if (
   !process.env.AWS_ACCESS_KEY_ID ||
   !process.env.AWS_SECRET_ACCESS_KEY ||
-  !process.env.AWS_BUCKET_NAME ||
-  !process.env.AWS_REGION
+  !process.env.AWS_BUCKET_NAME
 ) {
   console.warn("Missing AWS environment variables");
 }
@@ -24,7 +22,6 @@ if (
 =============================== */
 const s3 = new S3Client({
   region: process.env.AWS_REGION,
-
   credentials: {
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
@@ -40,51 +37,13 @@ const fileFilter = (req, file, cb) => {
     "image/jpg",
     "image/png",
     "image/webp",
-
-    // iPhone formats
-    "image/heic",
-    "image/heif",
   ];
 
   if (allowedTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    console.log("Blocked file type:", file.mimetype);
-
-    cb(
-      new Error(
-        "Only JPG, PNG, WEBP, HEIC and HEIF images are allowed"
-      ),
-      false
-    );
+    cb(new Error("Only JPG, PNG and WEBP images are allowed"), false);
   }
-};
-
-/* ===============================
-   GENERATE FILE PATH
-=============================== */
-const generateFilePath = (folder, req) => {
-  const ext = ".jpg";
-
-  if (folder === "profile_pic") {
-    const userId = req.user?.id || "temp";
-
-    return `profile_pic/${userId}/profile-${Date.now()}${ext}`;
-  }
-
-  if (folder === "ads") {
-    const adId = req.params.adId || "temp";
-
-    const uniqueName =
-      Date.now() + "-" + Math.round(Math.random() * 1e9);
-
-    return `ads/${adId}/${uniqueName}${ext}`;
-  }
-
-  const uniqueName =
-    Date.now() + "-" + Math.round(Math.random() * 1e9);
-
-  return `${folder}/${uniqueName}${ext}`;
 };
 
 /* ===============================
@@ -94,97 +53,81 @@ const createUploader = (folder) => {
   return multer({
     storage: multerS3({
       s3,
-
       bucket: process.env.AWS_BUCKET_NAME,
+      contentType: multerS3.AUTO_CONTENT_TYPE,
 
-      /* ===============================
-         FORCE JPEG CONTENT TYPE
-      =============================== */
-      contentType: (req, file, cb) => {
-        cb(null, "image/jpeg");
-      },
-
-      /* ===============================
-         METADATA
-      =============================== */
       metadata: (req, file, cb) => {
-        cb(null, {
-          fieldName: file.fieldname,
-        });
+        cb(null, { fieldName: file.fieldname });
       },
 
-      /* ===============================
-         ORIGINAL KEY
-      =============================== */
       key: (req, file, cb) => {
-        cb(null, generateFilePath(folder, req));
+        const ext = path.extname(file.originalname);
+
+        let filePath = "";
+
+        if (folder === "profile_pic") {
+          const userId = req.user?.id || "temp";
+          filePath = `profile_pic/${userId}/profile-${Date.now()}${ext}`;
+        } else if (folder === "ads") {
+          const adId = req.params.adId || "temp";
+          const uniqueName =
+            Date.now() + "-" + Math.round(Math.random() * 1e9);
+
+          filePath = `ads/${adId}/${uniqueName}${ext}`;
+        } else {
+          const uniqueName =
+            Date.now() + "-" + Math.round(Math.random() * 1e9);
+
+          filePath = `${folder}/${uniqueName}${ext}`;
+        }
+
+        cb(null, filePath);
       },
 
       /* ===============================
-         ENABLE TRANSFORM
+         🔥 THIS IS THE FIX
+         compress BEFORE upload
       =============================== */
-      shouldTransform: true,
+      shouldTransform: (req, file, cb) => {
+        cb(null, true);
+      },
 
-      /* ===============================
-         IMAGE TRANSFORMS
-      =============================== */
-      transforms: [
-        {
-          id: "compressed",
+      transforms: (req, file, cb) => {
+        let size, quality;
 
-          key: (req, file, cb) => {
-            cb(null, generateFilePath(folder, req));
+        if (folder === "profile_pic") {
+          size = 300;
+          quality = 60;
+        } else {
+          size = 1200;
+          quality = 85;
+        }
+
+        cb(null, [
+          {
+            id: "compressed",
+            key: (req, file, cb2) => cb2(null, file.key),
+            transform: (req, file, cb2) => {
+              cb2(
+                null,
+                sharp().resize({ width: size }).jpeg({ quality })
+              );
+            },
           },
-
-          transform: (req, file, cb) => {
-            let size = 1200;
-            let quality = 85;
-
-            // Profile pictures
-            if (folder === "profile_pic") {
-              size = 400;
-              quality = 70;
-            }
-
-            cb(
-              null,
-
-              sharp()
-
-                // Fix iPhone rotation
-                .rotate()
-
-                // Resize
-                .resize({
-                  width: size,
-                  withoutEnlargement: true,
-                })
-
-                // Convert to optimized JPEG
-                .jpeg({
-                  quality,
-                  mozjpeg: true,
-                })
-            );
-          },
-        },
-      ],
+        ]);
+      },
     }),
 
     fileFilter,
-
     limits: {
-      // 15MB max
-      fileSize: 15 * 1024 * 1024,
+      fileSize: 5 * 1024 * 1024,
     },
   });
 };
-
 /* ===============================
    UPLOADERS
 =============================== */
 const uploadAds = createUploader("ads");
-
 const uploadProfile = createUploader("profile_pic");
 
 /* ===============================
