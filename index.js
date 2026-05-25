@@ -45,8 +45,8 @@ app.use(
   cors({
     origin: [
       "http://localhost:4200",
-      "http://52.221.196.150",
-      "http://ec2-52-221-196-150.ap-southeast-1.compute.amazonaws.com",
+      "18.188.218.74",
+      "ec2-18-188-218-74.us-east-2.compute.amazonaws.com",
     ],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
