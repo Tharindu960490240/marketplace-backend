@@ -29,6 +29,9 @@ const createAdTable = async () => {
 
       district VARCHAR(100) NOT NULL,
       city VARCHAR(100) NOT NULL,
+      
+      latitude NUMERIC(10, 7),
+      longitude NUMERIC(10, 7),
 
       status VARCHAR(20) DEFAULT 'pending'
         CHECK (

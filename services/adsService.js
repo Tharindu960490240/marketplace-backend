@@ -17,6 +17,8 @@ const createAdService = async (data, userId) => {
     negotiable,
     district,
     city,
+    latitude,
+    longitude,
   } = data;
 
   const user = await getUserById(userId);
@@ -31,8 +33,8 @@ const createAdService = async (data, userId) => {
 
   const result = await pool.query(
     `INSERT INTO ads 
-     (user_id, title, description, category_id, sub_category, price, negotiable, district, city, status, is_featured)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,'pending',$10)
+     (user_id, title, description, category_id, sub_category, price, negotiable, district, city, latitude, longitude, status, is_featured)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,'pending',$12)
      RETURNING *`,
     [
       userId,
@@ -44,6 +46,8 @@ const createAdService = async (data, userId) => {
       negotiable ?? false,
       district,
       city,
+      latitude ?? null,
+      longitude ?? null,
       featured,
     ],
   );
@@ -544,7 +548,6 @@ const updateAdService = async (id, userId, data) => {
 
 // ================= DELETE AD =================
 const deleteAdService = async (adId, userId) => {
-
   const adCheck = await pool.query(
     "SELECT * FROM ads WHERE id=$1 AND user_id=$2",
     [adId, userId],
@@ -570,9 +573,7 @@ const deleteAdService = async (adId, userId) => {
   // DELETE FROM S3
   // ===============================
   for (const image of imagesResult.rows) {
-
     if (image.image_key) {
-
       await s3.send(
         new DeleteObjectCommand({
           Bucket: process.env.AWS_BUCKET_NAME,
@@ -585,15 +586,9 @@ const deleteAdService = async (adId, userId) => {
   // ===============================
   // DELETE DB RECORDS
   // ===============================
-  await pool.query(
-    "DELETE FROM ad_images WHERE ad_id=$1",
-    [adId],
-  );
+  await pool.query("DELETE FROM ad_images WHERE ad_id=$1", [adId]);
 
-  await pool.query(
-    "DELETE FROM ads WHERE id=$1",
-    [adId],
-  );
+  await pool.query("DELETE FROM ads WHERE id=$1", [adId]);
 
   return true;
 };
