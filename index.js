@@ -47,6 +47,7 @@ app.use(
       "http://localhost:4200",
       "18.188.218.74",
       "ec2-18-188-218-74.us-east-2.compute.amazonaws.com",
+      "https://marketplace.agrilinkservices.com"
     ],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
