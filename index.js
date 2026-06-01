@@ -5,6 +5,7 @@ const cors = require("cors");
 
 const cron = require("node-cron");
 const downgradeExpiredUsers = require("./jobs/subscriptionJob.js");
+const backupjob = require("./jobs/backupjob.js");
 
 // ================= ROUTES =================
 const authRoutes = require("./routes/authRouts.js");
@@ -47,7 +48,7 @@ app.use(
       "http://localhost:4200",
       "18.188.218.74",
       "ec2-18-188-218-74.us-east-2.compute.amazonaws.com",
-      "https://marketplace.agrilinkservices.com"
+      "https://marketplace.agrilinkservices.com",
     ],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -129,4 +130,11 @@ startServer();
 cron.schedule("0 0 * * *", () => {
   console.log("Running subscription cleanup...");
   downgradeExpiredUsers();
+});
+
+
+// runs every day at 2 AM (DB backup)
+cron.schedule("0 2 * * *", () => {
+  console.log("Running DB backup...");
+  backupDatabase();
 });
