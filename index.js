@@ -126,15 +126,24 @@ const startServer = async () => {
 
 startServer();
 
-// runs every day at 12 AM
-cron.schedule("0 0 * * *", () => {
-  console.log("Running subscription cleanup...");
-  downgradeExpiredUsers();
-});
+cron.schedule(
+  "0 0 * * *",
+  () => {
+    console.log("Running subscription cleanup...");
+    downgradeExpiredUsers();
+  },
+  {
+    timezone: "Asia/Colombo",
+  },
+);
 
-
-// runs every day at 2 AM (DB backup)
-cron.schedule("0 2 * * *", () => {
-  console.log("Running DB backup...");
-  backupDatabase();
-});
+cron.schedule(
+  "0 2 * * *",
+  () => {
+    console.log("Running DB backup...");
+    backupDatabase();
+  },
+  {
+    timezone: "Asia/Colombo",
+  },
+);
