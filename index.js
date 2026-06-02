@@ -5,7 +5,7 @@ const cors = require("cors");
 
 const cron = require("node-cron");
 const downgradeExpiredUsers = require("./jobs/subscriptionJob.js");
-const backupjob = require("./jobs/backupjob.js");
+const backupDatabase = require("./jobs/backupjob.js");
 
 // ================= ROUTES =================
 const authRoutes = require("./routes/authRouts.js");

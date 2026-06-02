@@ -19,7 +19,7 @@ const s3 = new S3Client({
 /* ===============================
    MAIN BACKUP FUNCTION
 =============================== */
-const backupjob = async () => {
+const backupDatabase = async () => {
   const DB_NAME = process.env.DB_NAME;
   const DB_USER = process.env.DB_USER;
   const DB_HOST = process.env.DB_HOST || "localhost";
@@ -75,4 +75,4 @@ const backupjob = async () => {
   });
 };
 
-module.exports = backupjob;
+module.exports = backupDatabase;
