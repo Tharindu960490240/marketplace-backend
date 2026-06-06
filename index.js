@@ -138,7 +138,7 @@ cron.schedule(
 );
 
 cron.schedule(
-  "25 12 * * *",
+  "0 0 * * *",
   () => {
     console.log("Running DB backup...");
     backupDatabase();
