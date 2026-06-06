@@ -1,12 +1,11 @@
 require("dotenv").config();
-
-const { exec } = require("child_process");
+const { spawn } = require("child_process");
+const { S3Client } = require("@aws-sdk/client-s3");
+const { Upload } = require("@aws-sdk/lib-storage");
 const fs = require("fs");
-const path = require("path");
-const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 
 /* ===============================
-   S3 CONFIG (same style as yours)
+   S3 CONFIG
 =============================== */
 const s3 = new S3Client({
   region: process.env.AWS_REGION,
@@ -19,58 +18,54 @@ const s3 = new S3Client({
 /* ===============================
    MAIN BACKUP FUNCTION
 =============================== */
-const backupDatabase = async () => {
+const backupDatabase = () => {
   const DB_NAME = process.env.DB_NAME;
   const DB_USER = process.env.DB_USER;
   const DB_HOST = process.env.DB_HOST || "localhost";
+  const DB_PASSWORD = process.env.DB_PASSWORD;
 
-  const fileName = `backup-${new Date().toISOString().split("T")[0]}.sql`;
-  const filePath = path.join("/tmp", fileName);
+  // STRATEGY: Verify the path exists before attempting to spawn
+  const possiblePaths = ["/usr/bin/pg_dump", "/usr/local/bin/pg_dump", "/usr/lib/postgresql/18/bin/pg_dump"];
+  const PG_DUMP_PATH = possiblePaths.find(path => fs.existsSync(path));
+
+  if (!PG_DUMP_PATH) {
+    throw new Error("CRITICAL: Could not find pg_dump binary on the system. Please run 'which pg_dump' in your terminal.");
+  }
+
+  console.log(`Using pg_dump at: ${PG_DUMP_PATH}`);
+
+  const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+  const fileName = `backup-${timestamp}.sql`;
 
   return new Promise((resolve, reject) => {
-    /* ===============================
-       1. CREATE POSTGRES DUMP
-    =============================== */
-    const command = `pg_dump -U ${DB_USER} -h ${DB_HOST} ${DB_NAME} > ${filePath}`;
-
-    exec(command, async (error) => {
-      if (error) {
-        console.error(" DB Backup failed:", error);
-        return reject(error);
+    const pgDump = spawn(
+      PG_DUMP_PATH,
+      ["-U", DB_USER, "-h", DB_HOST, DB_NAME],
+      {
+        env: { ...process.env, PGPASSWORD: DB_PASSWORD },
       }
+    );
 
-      //   console.log(" DB backup created:", fileName);
+    let errorOutput = "";
+    pgDump.stderr.on("data", (data) => { errorOutput += data.toString(); });
+    pgDump.on("error", (err) => { reject(err); });
 
-      try {
-        /* ===============================
-           2. READ FILE
-        =============================== */
-        const fileContent = fs.readFileSync(filePath);
+    const upload = new Upload({
+      client: s3,
+      params: {
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: `db-backups/${fileName}`,
+        Body: pgDump.stdout,
+        ContentType: "application/sql",
+      },
+    });
 
-        /* ===============================
-           3. UPLOAD TO S3
-        =============================== */
-        await s3.send(
-          new PutObjectCommand({
-            Bucket: process.env.AWS_BUCKET_NAME,
-            Key: `db-backups/${fileName}`,
-            Body: fileContent,
-            ContentType: "application/sql",
-          }),
-        );
+    upload.done()
+      .then(() => { resolve(true); })
+      .catch((err) => { reject(err); });
 
-        // console.log("Backup uploaded to S3");
-
-        /* ===============================
-           4. CLEAN LOCAL FILE
-        =============================== */
-        fs.unlinkSync(filePath);
-
-        resolve(true);
-      } catch (uploadErr) {
-        console.error("S3 upload failed:", uploadErr);
-        reject(uploadErr);
-      }
+    pgDump.on("close", (code) => {
+      if (code !== 0) reject(new Error(`pg_dump failed (${code}): ${errorOutput}`));
     });
   });
 };

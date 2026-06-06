@@ -138,12 +138,12 @@ cron.schedule(
 );
 
 cron.schedule(
-  "0 2 * * *",
+  "25 12 * * *",
   () => {
     console.log("Running DB backup...");
     backupDatabase();
   },
   {
-    timezone: "Asia/Colombo",
-  },
+    timezone: "Australia/Melbourne",
+  }
 );
