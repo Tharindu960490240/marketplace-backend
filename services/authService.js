@@ -339,6 +339,7 @@ const getAllUsers = async (query) => {
       status,
       email_verified,
       profile_image,
+      email_verification_token,
       created_at
     FROM users
     ${where}
