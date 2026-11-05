@@ -7,11 +7,13 @@ const buildEmailTemplate = ({ title, content, action }) => {
       <div style="max-width:600px;margin:0 auto;background:#ffffff;border-radius:10px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,0.05);">
 
         <!-- Header -->
-        <div style="padding:25px;text-align:center;">
+        <!-- The title is white, so the header needs a dark background or it
+             is invisible (white-on-white). Uses the brand navy. -->
+        <div style="background:#14245c;padding:28px 25px;text-align:center;">
           <img src="${process.env.LOGO_URL || "https://via.placeholder.com/120x40?text=Logo"}"
-               alt="Logo"
-               style="width:120px;margin-bottom:10px;" />
-          <h2 style="color:#ffffff;margin:0;font-size:22px;">
+               alt="Agri Link Services"
+               style="width:120px;margin-bottom:12px;" />
+          <h2 style="color:#ffffff;margin:0;font-size:22px;line-height:1.3;">
             ${title}
           </h2>
         </div>
@@ -26,11 +28,11 @@ const buildEmailTemplate = ({ title, content, action }) => {
               <div style="text-align:center;margin:30px 0;">
                 <a href="${action.url}"
                   style="
-                    background:linear-gradient(135deg,#2196f3 0%,#4dabf5 100%);
+                    background:#1f46b0;
                     color:#ffffff;
                     padding:14px 28px;
                     text-decoration:none;
-                    border-radius:6px;
+                    border-radius:8px;
                     font-weight:bold;
                     display:inline-block;
                     font-size:15px;">

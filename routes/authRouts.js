@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const { authMiddleware } = require("../middlewares/auth");
+const { authMiddleware, isAdmin } = require("../middlewares/auth");
 const { uploadProfile } = require("../middlewares/upload");
 
 const {
@@ -40,8 +40,8 @@ router.put(
 router.put("/me/password", authMiddleware, changeUserPassword);
 router.delete("/me", authMiddleware, deleteUserAccount);
 
-// Admin
-router.get("/", authMiddleware, getUsers);
-router.patch("/:id/status", authMiddleware, updateUserStatus);
+// Admin (require admin role, not just a valid login)
+router.get("/", authMiddleware, isAdmin, getUsers);
+router.patch("/:id/status", authMiddleware, isAdmin, updateUserStatus);
 
 module.exports = router;

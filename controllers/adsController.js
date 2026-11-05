@@ -138,34 +138,69 @@ const deleteAd = async (req, res) => {
 };
 
 /* ===========================
-   MARK AS SOLD
+   CHANGE AD STATUS
+   - Admin: approve / reject / sold / deleted / pending (any ad)
+   - Owner: only their own ad, and only the transitions a seller may make
+     (active <-> sold, and delete their own ad). Approving a pending ad or
+     rejecting is admin-only.
 =========================== */
+const VALID_STATUSES = ["pending", "active", "sold", "rejected", "deleted"];
+
+// Transitions a non-admin owner is allowed to make, keyed by current status
+const OWNER_TRANSITIONS = {
+  active: ["sold", "deleted"],
+  sold: ["active", "deleted"],
+  pending: ["deleted"],
+  rejected: ["deleted"],
+  deleted: [],
+};
+
 const changeStatus = async (req, res) => {
   try {
     let { status, reason } = req.body;
     const adId = req.params.id;
 
-    if (status !== "rejected") {
-      reason = null;
-    } else {
-      reason = reason?.trim() || null;
+    if (!VALID_STATUSES.includes(status)) {
+      return res.status(400).json({ error: "Invalid status" });
+    }
 
-      // optional strict validation
-      if (!reason) {
-        return res.status(400).json({ error: "Rejection reason is required" });
+    // 1. Load the ad (owner + current status) BEFORE changing anything
+    const ad = await getAdWithUserService(adId);
+    if (!ad) {
+      return res.status(404).json({ error: "Ad not found" });
+    }
+
+    const isAdmin = req.user.role === "admin";
+    const isOwner = ad.user_id === req.user.id;
+
+    // 2. Authorization
+    if (!isAdmin) {
+      if (!isOwner) {
+        return res.status(403).json({ error: "Not authorized to change this ad" });
+      }
+      const allowed = OWNER_TRANSITIONS[ad.status] || [];
+      if (!allowed.includes(status)) {
+        return res
+          .status(403)
+          .json({ error: "You can't change this ad to that status" });
       }
     }
 
-    // 1. Update status
+    // 3. Reason is only kept for rejection, and only an admin can reject
+    if (status === "rejected") {
+      reason = reason?.trim() || null;
+      if (!reason) {
+        return res.status(400).json({ error: "Rejection reason is required" });
+      }
+    } else {
+      reason = null;
+    }
+
+    // 4. Update status
     await changeStatusService(adId, status, reason);
 
-    // 2. Get ad + user info
-    const ad = await getAdWithUserService(adId);
-
-    // attach reason for email usage
+    // 5. Notify the ad owner by email
     ad.rejection_reason = reason;
-
-    // 3. Send email
     await sendAdStatusEmail(ad, status, reason);
 
     res.json({ message: "Ad marked as " + status });

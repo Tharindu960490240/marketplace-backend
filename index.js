@@ -42,14 +42,25 @@ const PORT = process.env.PORT || 3200;
 // ================= MIDDLEWARE =================
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+// CORS origins must be full origins (scheme + host), or they never match the
+// browser's Origin header. Pull extras from env so deploys don't need a code change.
+const allowedOrigins = [
+  "http://localhost:4200",
+  "http://18.188.218.74",
+  "https://marketplace.agrilinkservices.com",
+  process.env.FRONTEND_URL,
+  process.env.FRONTEND_URL_2,
+].filter(Boolean);
+
 app.use(
   cors({
-    origin: [
-      "http://localhost:4200",
-      "18.188.218.74",
-      "ec2-18-188-218-74.us-east-2.compute.amazonaws.com",
-      "https://marketplace.agrilinkservices.com",
-    ],
+    origin: (origin, callback) => {
+      // allow non-browser clients (curl, server-to-server) with no Origin
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error(`Not allowed by CORS: ${origin}`));
+    },
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
@@ -84,15 +95,16 @@ const startServer = async () => {
     // DB setup
     await createDatabase();
 
-    // Core tables
+    // Core tables — parents MUST come before children (FK order).
+    // `ads` references `categories`, so categories has to exist first.
     await createUserTable();
+    await createCategoriesTable();
     await createAdTable();
     await createAdImagesTable();
     await createFeaturedAdsTable();
     await createPaymentsTable();
     await createSavedAdsTable();
     await createReviewsTable();
-    await createCategoriesTable();
     await createSubscriptionsTable();
     await createSupportTables();
     await createNotificationTable();

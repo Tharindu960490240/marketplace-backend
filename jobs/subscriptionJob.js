@@ -1,8 +1,9 @@
-const pool = require("../config/database");
+// config/database exports { query, pool, createDatabase }
+const { query } = require("../config/database");
 
 const downgradeExpiredUsers = async () => {
   try {
-    await pool.query(`
+    await query(`
       UPDATE users
       SET subscription_type = 'basic'
       WHERE subscription_type = 'premium'

@@ -10,9 +10,7 @@ const {
 } = require("../services/supportService");
 const {
   createNotificationService,
-  getNotificationServices,
-  markAllAsReadService,
-  markAsReadService,
+  createAdminNotificationService,
   markNotificationsAsReadByReferenceService
 } = require("../services/notificationService");
 
@@ -24,8 +22,8 @@ const createTicket = async (req, res) => {
 
     const ticket = await createTicketService(userId, subject, message);
 
-    //  notify admin (replace with real admin logic)
-    await createNotificationService(1, "new_ticket", ticket.id);
+    //  notify every admin (was hardcoded to user id 1)
+    await createAdminNotificationService("new_ticket", ticket.id);
 
     res.json(ticket);
   } catch (err) {
@@ -53,10 +51,18 @@ const sendMessage = async (req, res) => {
 
     await sendMessageService(ticketId, senderId, message);
 
-    //  Notify other user
-    const receiverId = ticket.user_id === senderId ? 1 : ticket.user_id;
-
-    await createNotificationService(receiverId, "support_reply", ticketId);
+    //  Notify the other side: admin reply -> ticket owner; user reply -> all admins
+    if (req.user.role === "admin") {
+      if (ticket.user_id !== senderId) {
+        await createNotificationService(
+          ticket.user_id,
+          "support_reply",
+          ticketId,
+        );
+      }
+    } else {
+      await createAdminNotificationService("support_reply", ticketId);
+    }
 
     res.json({ success: true });
   } catch (err) {

@@ -24,8 +24,11 @@ const createReview = async (userId, adId, rating, comment) => {
 
 // ================= GET REVIEWS FOR AN AD =================
 const getReviewsByAd = async (adId) => {
+  // users has first_name/last_name, not a `name` column
   const result = await pool.query(
-    `SELECT r.*, u.name, u.email
+    `SELECT r.*,
+            u.first_name AS name,
+            u.profile_image AS url
      FROM reviews r
      JOIN users u ON r.user_id = u.id
      WHERE r.ad_id = $1

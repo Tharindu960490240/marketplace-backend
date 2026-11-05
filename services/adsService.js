@@ -659,7 +659,8 @@ const isPremium = (user) => {
 const getAdWithUserService = async (adId) => {
   const result = await pool.query(
     `
-    SELECT a.title, u.email AS user_email, u.first_name
+    SELECT a.id, a.user_id, a.status, a.title,
+           u.email AS user_email, u.first_name
     FROM ads a
     JOIN users u ON a.user_id = u.id
     WHERE a.id = $1

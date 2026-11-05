@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const { authMiddleware } = require("../middlewares/auth");
+const { authMiddleware, isAdmin } = require("../middlewares/auth");
 
 const {
   requestFeature,
@@ -19,7 +19,7 @@ router.patch("/:id/activate", authMiddleware, activateFeature);
 // get my featured ads
 router.get("/my", authMiddleware, myFeatures);
 
-// admin / cron trigger
-router.post("/expire", expireFeatures);
+// admin trigger (was unauthenticated — anyone could run it)
+router.post("/expire", authMiddleware, isAdmin, expireFeatures);
 
 module.exports = router;

@@ -91,11 +91,12 @@ const verifyUser = async (token) => {
     };
   }
 
-  // 2. Activate account
+  // 2. Activate account and clear the one-time token so it can't be reused
   await pool.query(
-    `UPDATE users 
+    `UPDATE users
      SET email_verified = true,
          status = 'active',
+         email_verification_token = NULL,
          updated_at = CURRENT_TIMESTAMP
      WHERE id = $1`,
     [user.id],
@@ -109,7 +110,8 @@ const verifyUser = async (token) => {
 // ================= GET USER BY ID =================
 const getUserById = async (userId) => {
   const result = await pool.query(
-    `SELECT id, first_name, last_name, email, phone, role, status, profile_image
+    `SELECT id, first_name, last_name, email, phone, role, status, profile_image,
+            subscription_type, subscription_expiry
      FROM users WHERE id = $1`,
     [userId],
   );

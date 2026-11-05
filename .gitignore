@@ -4,3 +4,8 @@ build
 firebaseServiceAccount.json
 
 uploads
+
+# Never commit real secrets
+.env
+.env.*
+!.env.example

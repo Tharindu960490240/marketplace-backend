@@ -14,15 +14,24 @@ const defaultPool = new Pool({
 // Function to create a new database if it doesn't exist
 const createDatabase = async () => {
   try {
-    // Check if the target database exists
+    const dbName = process.env.DB_NAME;
+
+    // A database name can't be parameterised, so validate it to avoid any
+    // injection via the env value before interpolating it into DDL.
+    if (!dbName || !/^[A-Za-z_][A-Za-z0-9_]*$/.test(dbName)) {
+      throw new Error(`Invalid DB_NAME: ${dbName}`);
+    }
+
+    // Check if the target database exists (parameterised)
     const res = await defaultPool.query(
-      `SELECT 1 FROM pg_database WHERE datname = '${process.env.DB_NAME}'`,
+      `SELECT 1 FROM pg_database WHERE datname = $1`,
+      [dbName],
     );
 
     if (res.rowCount === 0) {
-      // Database does not exist, create it
-      await defaultPool.query(`CREATE DATABASE ${process.env.DB_NAME}`);
-      console.log(`Database ${process.env.DB_NAME} created successfully!`);
+      // Database does not exist, create it (name already validated above)
+      await defaultPool.query(`CREATE DATABASE ${dbName}`);
+      console.log(`Database ${dbName} created successfully!`);
     } else {
       // console.log(`Database ${process.env.DB_NAME} already exists.`);
     }

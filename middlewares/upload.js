@@ -3,6 +3,9 @@ require("dotenv").config();
 const multer = require("multer");
 const multerS3 = require("multer-s3");
 const path = require("path");
+// `sharp` is used inside the transform below but was never imported — that
+// throws "sharp is not defined" the moment a transform runs.
+const sharp = require("sharp");
 
 const { S3Client } = require("@aws-sdk/client-s3");
 
@@ -85,8 +88,13 @@ const createUploader = (folder) => {
       },
 
       /* ===============================
-         🔥 THIS IS THE FIX
-         compress BEFORE upload
+         Compress BEFORE upload.
+         NOTE: shouldTransform/transforms are only honoured by the
+         `multer-s3-transform` package, NOT stock `multer-s3`. Make sure
+         package.json depends on "multer-s3-transform" and that this line
+         imports it (const multerS3 = require("multer-s3-transform")),
+         otherwise these options are silently ignored and images upload
+         uncompressed.
       =============================== */
       shouldTransform: (req, file, cb) => {
         cb(null, true);

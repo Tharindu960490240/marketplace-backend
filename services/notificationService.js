@@ -9,6 +9,15 @@ const createNotificationService = async (userId, type, referenceId) => {
   );
 };
 
+//  Notify every admin (replaces the hardcoded "admin = user id 1")
+const createAdminNotificationService = async (type, referenceId) => {
+  await pool.query(
+    `INSERT INTO notifications (user_id, type, reference_id)
+     SELECT id, $1, $2 FROM users WHERE role = 'admin'`,
+    [type, referenceId]
+  );
+};
+
 //  Get notifications
 const getNotificationServices = async (userId) => {
   const result = await pool.query(
@@ -73,6 +82,7 @@ const markNotificationsAsReadByReferenceService = async (
 
 module.exports = {
   createNotificationService,
+  createAdminNotificationService,
   getNotificationServices,
   markAsReadService,
   markAllAsReadService,

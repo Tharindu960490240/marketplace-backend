@@ -16,7 +16,7 @@ const getDashboardStatsService = async () => {
 
   // Total views
   const views = await pool.query(
-    `SELECT COALESCE(SUM(views_count),0) FROM ads`,
+    `SELECT COALESCE(SUM(views_count),0) AS total_views FROM ads`,
   );
 
   // Categories
@@ -26,7 +26,7 @@ const getDashboardStatsService = async () => {
     activeCount: parseInt(activeAds.rows[0].count, 10),
     sellerCount: parseInt(sellers.rows[0].count, 10),
     totalAds: parseInt(totalAds.rows[0].count, 10),
-    totalViews: parseInt(views.rows[0].coalesce, 10),
+    totalViews: parseInt(views.rows[0].total_views, 10),
     categoryCount: parseInt(categories.rows[0].count, 10),
   };
 };
@@ -118,9 +118,10 @@ const getAdminDashboardStatsService = async () => {
     users: parseInt(users.rows[0].count, 10),
     totalAds: parseInt(totalAds.rows[0].count, 10),
     views: parseInt(views.rows[0].total_views, 10),
-    categories: parseInt(categories.rows[0].count, 10),
+    categoryCount: parseInt(categories.rows[0].count, 10),
 
     growth: growth.rows,
+    // the frontend reads `categories` as the per-category breakdown (and its length)
     categories: categoryStats.rows,
     recentAds: recentAds.rows,
     topUsers: topUsers.rows,
